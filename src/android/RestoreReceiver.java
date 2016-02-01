@@ -43,7 +43,7 @@ public class RestoreReceiver extends AbstractRestoreReceiver {
     @Override
     public void onRestore (Notification notification) {
         if (notification.isScheduled()) {
-            //disabling it due to but in the plugin. Enable it back when fixed.
+            //disabling it due to bug in the plugin. Enable it back when fixed.
             //notification.schedule();
         }
     }

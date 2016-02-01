@@ -139,24 +139,25 @@ public class Notification {
 
     /**
      * If the notification is an update.
+     *
+     * @param keepFlag
+     *      Set to false to remove the flag from the option map
      */
-    protected boolean isUpdate () {
+    protected boolean isUpdate (boolean keepFlag) {
+        boolean updated = options.getDict().optBoolean("updated", false);
 
-        if (!options.getDict().has("updatedAt"))
-            return false;
+        if (!keepFlag) {
+            options.getDict().remove("updated");
+        }
 
-        long now = new Date().getTime();
-
-        long updatedAt = options.getDict().optLong("updatedAt", now);
-
-        return (now - updatedAt) < 1000;
+        return updated;
     }
 
     /**
      * Notification type can be one of pending or scheduled.
      */
     public Type getType () {
-        return isTriggered() ? Type.TRIGGERED : Type.SCHEDULED;
+        return isScheduled() ? Type.SCHEDULED : Type.TRIGGERED;
     }
 
     /**
@@ -185,14 +186,14 @@ public class Notification {
 
     /**
      * Clear the local notification without canceling repeating alarms.
-     *
      */
     public void clear () {
-        if (!isRepeating() && wasInThePast()) {
+
+        if (!isRepeating() && wasInThePast())
             unpersist();
-        } else {
+
+        if (!isRepeating())
             getNotMgr().cancel(getId());
-        }
     }
 
     /**
@@ -241,13 +242,6 @@ public class Notification {
     }
 
     /**
-     * Show as modal dialog when in foreground.
-     */
-    private void showDialog () {
-        // TODO
-    }
-
-    /**
      * Count of triggers since schedule.
      */
     public int getTriggerCountSinceSchedule() {
@@ -277,7 +271,7 @@ public class Notification {
         }
 
         json.remove("firstAt");
-        json.remove("updatedAt");
+        json.remove("updated");
         json.remove("soundUri");
         json.remove("iconUri");
 
